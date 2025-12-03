@@ -1,8 +1,54 @@
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { useState } from 'react';
 import { Quote, Star, Trophy, Users, TrendingUp, Award } from 'lucide-react';
-import testimonialImage from 'figma:asset/c0e8c247c86da5e25cf942ecca6b7b5634329ef8.png';
+import photo1 from 'figma:asset/4fde84671586d1c00d1297a2d3d8127699973b9a.png';
+import photo2 from 'figma:asset/b728ea935b5bf5b3c1a460b1c6e985ffdc0aecd7.png';
+import photo3 from 'figma:asset/fef7ea5deb8a62142ca69824d2bbf7bd3127f8ba.png';
+
+const testimonials = [
+  {
+    id: 1,
+    image: photo1,
+    quote: 'Я думал, что хакатоны и акселераторы — это только для "продвинутых". С HackRoast всё оказалось намного проще: короткое обучение, понятные шаги и полноценная поддержка от наставника на протяжении всего хакатона. Наш проект выиграл, и это был первый раз, когда я почувствовал, что могу что-то создать. Теперь участвую в мероприятиях регулярно.',
+    name: 'Максим',
+    age: '19 лет',
+    role: 'дизайнер',
+    stats: {
+      wins: '3',
+      prizes: '₽1.2M',
+      learning: '2 мес',
+    },
+  },
+  {
+    id: 2,
+    image: photo2,
+    quote: 'До HackRoast я даже не знал, с чего начать. Программа помогла мне разобраться в основах, найти команду и выиграть первый хакатон за месяц. Теперь у меня есть портфолио и уверенность в своих силах.',
+    name: 'Анна',
+    age: '21 год',
+    role: 'frontend-разработчик',
+    stats: {
+      wins: '2',
+      prizes: '₽800K',
+      learning: '1 мес',
+    },
+  },
+  {
+    id: 3,
+    image: photo3,
+    quote: 'Самое ценное в HackRoast — это не только обучение, но и сообщество. Здесь я нашел единомышленников, с которыми мы продолжаем работать над проектами и после хакатонов.',
+    name: 'Дмитрий',
+    age: '23 года',
+    role: 'backend-разработчик',
+    stats: {
+      wins: '4',
+      prizes: '₽1.5M',
+      learning: '3 мес',
+    },
+  },
+];
 
 export function TestimonialsSection() {
+  const [activeTestimonial, setActiveTestimonial] = useState(testimonials[0]);
+
   return (
     <section id="testimonials" className="py-20 md:py-32" style={{ backgroundColor: '#0a0506' }}>
       <div className="max-w-[1280px] mx-auto px-6">
@@ -30,8 +76,8 @@ export function TestimonialsSection() {
                 style={{ borderColor: '#FDA72E' }}
               >
                 <img
-                  src={testimonialImage}
-                  alt="Максим - Победитель хакатона"
+                  src={activeTestimonial.image}
+                  alt={`${activeTestimonial.name} - Победитель хакатона`}
                   className="w-full aspect-[3/4] object-cover"
                 />
               </div>
@@ -61,12 +107,14 @@ export function TestimonialsSection() {
                 </div>
 
                 <p className="text-2xl leading-relaxed" style={{ color: '#FCF2D9' }}>
-                  Я думал, что хакатоны и акселераторы — это только для "продвинутых". С HackRoast всё оказалось намного проще: короткое обучение, понятные шаги и полноценная поддержка от наставника на протяжении всего хакатона. Наш проект выиграл, и это был первый раз, когда я почувствовал, что могу что-то создать. Теперь участвую в мероприятиях регулярно.
+                  {activeTestimonial.quote}
                 </p>
 
                 <div className="space-y-2">
-                  <div className="text-xl" style={{ color: '#FCF2D9' }}>Максим</div>
-                  <div style={{ color: 'rgba(252, 242, 217, 0.6)' }}>19 лет, дизайнер</div>
+                  <div className="text-xl" style={{ color: '#FCF2D9' }}>{activeTestimonial.name}</div>
+                  <div style={{ color: 'rgba(252, 242, 217, 0.6)' }}>
+                    {activeTestimonial.age}, {activeTestimonial.role}
+                  </div>
                 </div>
 
                 {/* Stats */}
@@ -75,25 +123,54 @@ export function TestimonialsSection() {
                     className="rounded-2xl p-4 text-center"
                     style={{ backgroundColor: 'rgba(252, 242, 217, 0.05)', border: '1px solid rgba(252, 242, 217, 0.1)' }}
                   >
-                    <div className="text-2xl mb-1" style={{ color: '#81021F' }}>3</div>
+                    <div className="text-2xl mb-1" style={{ color: '#81021F' }}>
+                      {activeTestimonial.stats.wins}
+                    </div>
                     <div className="text-xs" style={{ color: 'rgba(252, 242, 217, 0.5)' }}>Победы</div>
                   </div>
                   <div
                     className="rounded-2xl p-4 text-center"
                     style={{ backgroundColor: 'rgba(252, 242, 217, 0.05)', border: '1px solid rgba(252, 242, 217, 0.1)' }}
                   >
-                    <div className="text-2xl mb-1" style={{ color: '#81021F' }}>₽1.2M</div>
+                    <div className="text-2xl mb-1" style={{ color: '#81021F' }}>
+                      {activeTestimonial.stats.prizes}
+                    </div>
                     <div className="text-xs" style={{ color: 'rgba(252, 242, 217, 0.5)' }}>Призов</div>
                   </div>
                   <div
                     className="rounded-2xl p-4 text-center"
                     style={{ backgroundColor: 'rgba(252, 242, 217, 0.05)', border: '1px solid rgba(252, 242, 217, 0.1)' }}
                   >
-                    <div className="text-2xl mb-1" style={{ color: '#81021F' }}>2 мес</div>
+                    <div className="text-2xl mb-1" style={{ color: '#81021F' }}>
+                      {activeTestimonial.stats.learning}
+                    </div>
                     <div className="text-xs" style={{ color: 'rgba(252, 242, 217, 0.5)' }}>Обучения</div>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Horizontal Gallery */}
+          <div className="space-y-4">
+            <h4 className="text-center" style={{ color: '#FCF2D9' }}>Больше историй успеха</h4>
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+              {testimonials.map((testimonial) => (
+                <button
+                  key={testimonial.id}
+                  onClick={() => setActiveTestimonial(testimonial)}
+                  className="flex-shrink-0 w-32 h-32 rounded-2xl overflow-hidden border-4 transition-all hover:scale-105"
+                  style={{
+                    borderColor: activeTestimonial.id === testimonial.id ? '#FDA72E' : 'rgba(252, 242, 217, 0.2)',
+                  }}
+                >
+                  <img
+                    src={testimonial.image}
+                    alt={testimonial.name}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
             </div>
           </div>
 
@@ -121,9 +198,9 @@ export function TestimonialsSection() {
             {/* Stats Grid */}
             <div className="grid md:grid-cols-4 gap-6 pt-8">
               {[
-                { icon: Users, value: '500+', label: 'Выпускников' },
-                { icon: Trophy, value: '150+', label: 'Побед на хакатонах' },
-                { icon: TrendingUp, value: '₽50M+', label: 'Выигранных грантов' },
+                { icon: Users, value: '50+', label: 'Выпускников' },
+                { icon: Trophy, value: '10+', label: 'Побед на хакатонах' },
+                { icon: TrendingUp, value: '₽1M+', label: 'Выигранных грантов' },
                 { icon: Star, value: '4.9', label: 'Средняя оценка' },
               ].map((stat, index) => {
                 const Icon = stat.icon;

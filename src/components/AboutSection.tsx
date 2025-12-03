@@ -33,7 +33,7 @@ export function AboutSection() {
                   <div className="w-1 h-12 rounded-full" style={{ backgroundColor: '#FDA72E' }} />
                   <div>
                     <div>Команда HackRoast</div>
-                    <div className="text-sm opacity-70">50+ побед на хакатонах</div>
+                    <div className="text-sm opacity-70">5+ побед на хакатонах</div>
                   </div>
                 </div>
               </div>
@@ -64,19 +64,19 @@ export function AboutSection() {
             {[
               {
                 icon: Target,
-                number: '50+',
+                number: '10+',
                 label: 'Выигранных хакатонов',
                 color: '#81021F',
               },
               {
                 icon: Zap,
-                number: '₽50M+',
+                number: '₽1M+',
                 label: 'Полученных грантов',
                 color: '#FDA72E',
               },
               {
                 icon: TrendingUp,
-                number: '500+',
+                number: '50+',
                 label: 'Обученных студентов',
                 color: '#81021F',
               },

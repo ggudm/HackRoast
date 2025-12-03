@@ -46,16 +46,16 @@ export function Hero() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 pt-8">
               <div className="text-center">
-                <div className="text-3xl mb-1" style={{ color: '#81021F' }}>500+</div>
-                <div className="text-sm" style={{ color: 'rgba(252, 242, 217, 0.6)' }}>Выпускников</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl mb-1" style={{ color: '#81021F' }}>150+</div>
+                <div className="text-3xl mb-1" style={{ color: '#81021F' }}>10+</div>
                 <div className="text-sm" style={{ color: 'rgba(252, 242, 217, 0.6)' }}>Побед</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl mb-1" style={{ color: '#81021F' }}>₽50M+</div>
+                <div className="text-3xl mb-1" style={{ color: '#81021F' }}>₽1M+</div>
                 <div className="text-sm" style={{ color: 'rgba(252, 242, 217, 0.6)' }}>Грантов</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl mb-1" style={{ color: '#81021F' }}>50+</div>
+                <div className="text-sm" style={{ color: 'rgba(252, 242, 217, 0.6)' }}>Выпускников</div>
               </div>
             </div>
           </div>
