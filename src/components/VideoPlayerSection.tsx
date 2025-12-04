@@ -1,9 +1,22 @@
 import { Play, Lock, Infinity, CheckCircle2 } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 export function VideoPlayerSection() {
   const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Вставьте URL вашего видео здесь (прямая ссылка на .mp4/.mov файл)
+  const videoUrl = '/vid.mov';
+
+  const handlePlay = () => {
+    if (videoRef.current) {
+      videoRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch((error) => {
+        console.log('Video play was prevented:', error);
+      });
+    }
+  };
 
   return (
     <section className="py-20 md:py-32" style={{ backgroundColor: '#0a0506' }}>
@@ -22,19 +35,25 @@ export function VideoPlayerSection() {
           {/* Video Player */}
           <div className="relative rounded-[3rem] overflow-hidden shadow-2xl group">
             <div className="aspect-video bg-black relative">
-              <ImageWithFallback
-                src="https://images.unsplash.com/photo-1638202677704-b74690bb8fa9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYWNrYXRob24lMjB0ZWFtJTIwY29kaW5nfGVufDF8fHx8MTc2NDcxNzg2Mnww&ixlib=rb-4.1.0&q=80&w=1080"
-                alt="Hackathon Team"
-                className="w-full h-full object-cover opacity-80"
-              />
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                controls={isPlaying}
+                playsInline
+              >
+                <source src={videoUrl} type="video/mp4" />
+                Ваш браузер не поддерживает видео.
+              </video>
 
               {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              {!isPlaying && (
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              )}
 
               {/* Play Button */}
               {!isPlaying && (
                 <button
-                  onClick={() => setIsPlaying(true)}
+                  onClick={handlePlay}
                   className="absolute inset-0 flex items-center justify-center group"
                   aria-label="Play video"
                 >
