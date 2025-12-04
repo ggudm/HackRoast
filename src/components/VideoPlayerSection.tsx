@@ -6,10 +6,19 @@ export function VideoPlayerSection() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [duration, setDuration] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Вставьте URL вашего видео здесь (прямая ссылка на .mp4/.mov файл)
   const videoUrl = '/vid.MOV';
+
+  // Форматирование времени в формат M:SS
+  const formatDuration = (seconds: number | null): string => {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const handlePlay = () => {
     if (videoRef.current) {
@@ -53,6 +62,12 @@ export function VideoPlayerSection() {
       setIsLoaded(true);
       setHasError(false);
       console.log('Video loaded successfully');
+    };
+    const handleLoadedMetadata = () => {
+      if (video.duration && isFinite(video.duration)) {
+        setDuration(video.duration);
+        console.log('Video duration:', video.duration);
+      }
     };
     const handleError = (e: Event) => {
       const error = video.error;
@@ -115,6 +130,7 @@ export function VideoPlayerSection() {
     video.addEventListener('play', handlePlayEvent);
     video.addEventListener('pause', handlePauseEvent);
     video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
     video.addEventListener('canplay', handleCanPlay);
     video.addEventListener('error', handleError);
     video.addEventListener('loadstart', handleLoadStart);
@@ -128,6 +144,7 @@ export function VideoPlayerSection() {
       video.removeEventListener('play', handlePlayEvent);
       video.removeEventListener('pause', handlePauseEvent);
       video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       video.removeEventListener('canplay', handleCanPlay);
       video.removeEventListener('error', handleError);
       video.removeEventListener('loadstart', handleLoadStart);
@@ -225,7 +242,7 @@ export function VideoPlayerSection() {
                       <h3 className="text-white">
                         Что такое хакатон — как собрать команду мечты?
                       </h3>
-                      <p className="text-white/80">15:32 минут</p>
+                      <p className="text-white/80">{formatDuration(duration)}</p>
                     </div>
                   </div>
                 </div>
