@@ -1,22 +1,140 @@
 import { Play, Lock, Infinity, CheckCircle2 } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export function VideoPlayerSection() {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Вставьте URL вашего видео здесь (прямая ссылка на .mp4/.mov файл)
-  const videoUrl = '/vid.mov';
+  const videoUrl = '/vid.MOV';
 
   const handlePlay = () => {
     if (videoRef.current) {
       videoRef.current.play().then(() => {
         setIsPlaying(true);
       }).catch((error) => {
-        console.log('Video play was prevented:', error);
+        console.error('Video play was prevented:', error);
+        setHasError(true);
+        setErrorMessage('Не удалось воспроизвести видео. Попробуйте обновить страницу.');
       });
     }
   };
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Проверка доступности файла
+    const checkVideoFile = async () => {
+      try {
+        const response = await fetch(videoUrl, { method: 'HEAD' });
+        if (!response.ok) {
+          console.warn(`Video file check: ${response.status} ${response.statusText}`);
+        } else {
+          console.log('Video file is accessible');
+        }
+      } catch (error) {
+        console.warn('Could not check video file:', error);
+      }
+    };
+    checkVideoFile();
+
+    const handlePlayEvent = () => {
+      setIsPlaying(true);
+      setHasError(false);
+    };
+    const handlePauseEvent = () => {
+      setIsPlaying(false);
+    };
+    const handleLoadedData = () => {
+      setIsLoaded(true);
+      setHasError(false);
+      console.log('Video loaded successfully');
+    };
+    const handleError = (e: Event) => {
+      const error = video.error;
+      let errorMsg = 'Ошибка загрузки видео';
+      
+      if (error) {
+        switch (error.code) {
+          case MediaError.MEDIA_ERR_ABORTED:
+            errorMsg = 'Загрузка видео была прервана';
+            break;
+          case MediaError.MEDIA_ERR_NETWORK:
+            errorMsg = 'Ошибка сети при загрузке видео';
+            break;
+          case MediaError.MEDIA_ERR_DECODE:
+            errorMsg = 'Видео не может быть декодировано. Возможно, формат не поддерживается браузером.';
+            break;
+          case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            errorMsg = 'Формат видео не поддерживается. Рекомендуется конвертировать в MP4 (H.264).';
+            break;
+          default:
+            errorMsg = `Ошибка видео: ${error.message || 'Неизвестная ошибка'}`;
+        }
+      }
+      
+      console.error('Video error:', {
+        code: error?.code,
+        message: error?.message,
+        errorMsg,
+        event: e,
+        videoSrc: video.currentSrc,
+        networkState: video.networkState,
+        readyState: video.readyState,
+        canPlayType: {
+          quicktime: video.canPlayType('video/quicktime'),
+          mp4: video.canPlayType('video/mp4'),
+          m4v: video.canPlayType('video/x-m4v')
+        }
+      });
+      
+      setIsLoaded(false);
+      setHasError(true);
+      setErrorMessage(errorMsg);
+    };
+    const handleCanPlay = () => {
+      console.log('Video can play');
+      setIsLoaded(true);
+      setHasError(false);
+    };
+    const handleLoadStart = () => {
+      console.log('Video load started');
+      setHasError(false);
+    };
+    const handleStalled = () => {
+      console.warn('Video stalled');
+    };
+    const handleWaiting = () => {
+      console.log('Video waiting for data');
+    };
+
+    video.addEventListener('play', handlePlayEvent);
+    video.addEventListener('pause', handlePauseEvent);
+    video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('error', handleError);
+    video.addEventListener('loadstart', handleLoadStart);
+    video.addEventListener('stalled', handleStalled);
+    video.addEventListener('waiting', handleWaiting);
+
+    // Попытка загрузить видео
+    video.load();
+
+    return () => {
+      video.removeEventListener('play', handlePlayEvent);
+      video.removeEventListener('pause', handlePauseEvent);
+      video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('error', handleError);
+      video.removeEventListener('loadstart', handleLoadStart);
+      video.removeEventListener('stalled', handleStalled);
+      video.removeEventListener('waiting', handleWaiting);
+    };
+  }, [videoUrl]);
 
   return (
     <section className="py-20 md:py-32" style={{ backgroundColor: '#0a0506' }}>
@@ -40,21 +158,25 @@ export function VideoPlayerSection() {
                 className="w-full h-full object-cover"
                 controls={isPlaying}
                 playsInline
+                preload="auto"
+                muted={false}
               >
+                <source src={videoUrl} type="video/quicktime" />
                 <source src={videoUrl} type="video/mp4" />
+                <source src={videoUrl} type="video/x-m4v" />
                 Ваш браузер не поддерживает видео.
               </video>
-
+              
               {/* Overlay */}
-              {!isPlaying && (
+              {!isPlaying && !hasError && (
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               )}
 
               {/* Play Button */}
-              {!isPlaying && (
+              {!isPlaying && !hasError && (
                 <button
                   onClick={handlePlay}
-                  className="absolute inset-0 flex items-center justify-center group"
+                  className="absolute inset-0 flex items-center justify-center group z-10"
                   aria-label="Play video"
                 >
                   <div
@@ -66,20 +188,48 @@ export function VideoPlayerSection() {
                 </button>
               )}
 
-              {/* Video Info */}
-              <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-                <div className="flex items-end justify-between">
-                  <div className="space-y-2">
-                    <div className="inline-block px-3 py-1 rounded-full text-sm" style={{ backgroundColor: '#FDA72E' }}>
-                      Бесплатный урок
-                    </div>
-                    <h3 className="text-white">
-                      Что такое хакатон — как собрать команду мечты?
-                    </h3>
-                    <p className="text-white/80">15:32 минут</p>
+              {/* Error Message */}
+              {hasError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/90 p-8 z-20">
+                  <div className="text-center text-white space-y-4 max-w-md">
+                    <p className="text-lg font-semibold">⚠️ Ошибка загрузки видео</p>
+                    <p className="text-sm text-white/80">{errorMessage}</p>
+                    <p className="text-xs text-white/60">
+                      Формат MOV может не поддерживаться вашим браузером. 
+                      Рекомендуется конвертировать видео в MP4 (H.264) для лучшей совместимости.
+                    </p>
+                    <button
+                      onClick={() => {
+                        setHasError(false);
+                        if (videoRef.current) {
+                          videoRef.current.load();
+                        }
+                      }}
+                      className="mt-4 px-4 py-2 rounded-lg text-sm"
+                      style={{ backgroundColor: '#81021F', color: 'white' }}
+                    >
+                      Попробовать снова
+                    </button>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {/* Video Info */}
+              {!isPlaying && (
+                <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+                  <div className="flex items-end justify-between">
+                    <div className="space-y-2">
+                      <div className="inline-block px-3 py-1 rounded-full text-sm" style={{ backgroundColor: '#FDA72E' }}>
+                        Бесплатный урок
+                      </div>
+                      <h3 className="text-white">
+                        Что такое хакатон — как собрать команду мечты?
+                      </h3>
+                      <p className="text-white/80">15:32 минут</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
